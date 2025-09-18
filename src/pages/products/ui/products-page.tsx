@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { client } from "../../../shared/api";
 import { ProductCard } from "../../../shared/ui/product-card/product-card";
+import type { IProduct } from "../../../shared/models";
 
 export const ProductsPage = () => {
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState<IProduct[] | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -12,8 +13,9 @@ export const ProductsPage = () => {
       setProducts(response.data.data);
     })();
   }, []);
+
   return (
-    <main className="px-[100px] py-10">
+    <>
       <div>
         <h1 className="font-semibold font-poppins text-[#10151F] text-[42px]">
           Products Page
@@ -25,6 +27,6 @@ export const ProductsPage = () => {
             <ProductCard key={product.id} {...product} />
           ))}
       </div>
-    </main>
+    </>
   );
 };

@@ -1,12 +1,7 @@
 import { NavLink } from "react-router";
+import type { IProduct } from "../../models";
 
-interface IProduct {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  images: string[];
-}
+
 
 export const ProductCard = (product: IProduct) => {
   return (

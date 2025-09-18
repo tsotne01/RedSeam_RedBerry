@@ -21,7 +21,9 @@ export const Header = () => {
           </NavLink>
         </div>
       </header>
-      <Outlet />
+      <main className="px-[100px] py-7">
+        <Outlet />
+      </main>
     </>
   );
 };
