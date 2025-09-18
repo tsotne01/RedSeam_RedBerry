@@ -8,7 +8,7 @@ import toast from "react-hot-toast";
 import cartIcon from "../../../assets/icons/cart_icon.svg"
 import { useAuth } from "../../../shared/hooks/use-auth";
 import { paths } from "../../../shared/constants";
-import { useCart } from "../../../widgets/cart/hooks/use-cart";
+import { useCart } from "../../../features/cart/hooks/use-cart";
 import { ProductImages } from "../../../widgets/product-images";
 
 export const ProductDetailsPage = () => {

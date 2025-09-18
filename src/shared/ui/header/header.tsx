@@ -6,8 +6,8 @@ import cartIconDark from "../../../assets/icons/cart_icon_dark.svg"
 // cart UI moved to widget
 import { useAuth } from "../../hooks/use-auth";
 import { useState } from "react";
-import { CartWidget } from "../../../widgets/cart";
-import { useCart } from "../../../widgets/cart/hooks/use-cart";
+import { CartWidget } from "../../../features/cart";
+import { useCart } from "../../../features/cart/hooks/use-cart";
 export const Header = () => {
   const { isAuthenticated, user } = useAuth();
   const [isCartOpen, setIsCartOpen] = useState(false);

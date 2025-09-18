@@ -3,6 +3,8 @@ import { Button } from "../../../shared/ui/button/button";
 import { useNavigate } from "react-router";
 import { useCart, type ICartItem } from "../hooks/use-cart";
 
+import closeIcon from "../../../assets/icons/close_icon.png"
+
 export const CartWidget = ({ onClose }: { onClose: () => void }) => {
   const navigate = useNavigate();
   const {
@@ -12,7 +14,6 @@ export const CartWidget = ({ onClose }: { onClose: () => void }) => {
     incrementCartItemQuantity,
     decrementCartItemQuantity,
     removeFromCart,
-    clearCart,
   } = useCart();
 
   return (
@@ -23,30 +24,26 @@ export const CartWidget = ({ onClose }: { onClose: () => void }) => {
       ></div>
       <div className="fixed top-0 right-0 bg-white z-20 w-1/3 h-full flex flex-col justify-between p-[40px]">
         <div>
-          <div className="flex justify-between items-center">
-            <h2 className="font-poppins text-[#10151F] font-semibold">Shopping cart</h2>
+          <div className="flex justify-between items-center mb-[151px]">
+            <h2 className="font-poppins text-[#10151F] font-semibold">Shopping cart ({totalQuantity})</h2>
             <div className="flex items-center gap-3">
-              {totalQuantity > 0 && (
-                <button className="text-sm underline" onClick={clearCart}>
-                  Clear all
-                </button>
-              )}
-              <button className="text-black" onClick={onClose}>
-                X
+              <button className="text-black cursor-pointer" onClick={onClose}>
+                <img src={closeIcon} alt="close" />
               </button>
             </div>
           </div>
           {totalQuantity === 0 && (
-            <div>
-              <img src={noItemsImage} alt="cart" />
-              <h2>Ooops!</h2>
-              <p>You've got nothing in your cart just yet...</p>
+            <div className="flex items-center justify-center flex-col">
+              <img className="mb-[24px]" src={noItemsImage} alt="cart" />
+              <h2 className="text-2xl text-[#10151F] font-semibold font-poppins mb-4">Ooops!</h2>
+              <p className=" text-[#3E424A] text-sm font-poppins mb-[58px]">You've got nothing in your cart just yet...</p>
               <Button
                 size="small"
                 onClick={() => {
                   onClose();
                   navigate("/");
                 }}
+                className="w-[214px]"
               >
                 Start shopping
               </Button>
