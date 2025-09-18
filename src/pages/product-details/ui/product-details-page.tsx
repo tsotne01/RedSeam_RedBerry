@@ -14,8 +14,8 @@ export const ProductDetailsPage = () => {
     (async () => {
       if (id) {
         const response = await client(`/products/${id}`);
-        console.log("response",response);
-        console.log("data",response.data)
+        console.log("response", response);
+        console.log("data", response.data)
         setProduct(response.data);
       }
     })();
@@ -64,17 +64,19 @@ export const ProductDetailsPage = () => {
           </span>
           <div className="flex gap-2">
             {product.available_colors &&
-              product.available_colors.map((color) => (
+              product.available_colors.map((color, index) => (
                 <button
                   type="button"
                   key={color}
-                  className={`w-[38px] h-[38px] border border-gray-300 rounded-full inline-block ${
-                    currentColor === color
-                      ? "ring-2 ring-offset-4 ring-[#E1DFE1]"
-                      : ""
-                  }`}
+                  className={`w-[38px] h-[38px] border border-gray-300 rounded-full inline-block ${currentColor === color
+                    ? "ring-2 ring-offset-4 ring-[#E1DFE1]"
+                    : ""
+                    }`}
                   style={{ backgroundColor: color }}
-                  onClick={() => setCurrentColor(color)}
+                  onClick={() => {
+                    setCurrentColor(color)
+                    setCurrentImageIndex(index)
+                  }}
                   aria-label={color}
                 ></button>
               ))}
@@ -90,11 +92,10 @@ export const ProductDetailsPage = () => {
                 <button
                   type="button"
                   key={size}
-                  className={`w-[38px] h-[38px] border border-gray-300 rounded-full inline-block ml-3 ${
-                    currentSize === size
-                      ? "ring-2 ring-offset-4 ring-[#E1DFE1]"
-                      : ""
-                  }`}
+                  className={`w-[38px] h-[38px] border border-gray-300 rounded-full inline-block ml-3 ${currentSize === size
+                    ? "ring-2 ring-offset-4 ring-[#E1DFE1]"
+                    : ""
+                    }`}
                   onClick={() => setCurrentSize(size)}
                   aria-label={size}
                 ></button>
@@ -112,9 +113,9 @@ export const ProductDetailsPage = () => {
             name="quantity"
             id="quantity"
           >
-            {[1, 2, 3, 4, 5].map((qty) => (
-              <option key={qty} value={qty}>
-                {qty}
+            {Array.from({ length: product.quantity || 5 }).map((qty, index) => (
+              <option key={index} value={index}>
+                {index}
               </option>
             ))}
           </select>
@@ -123,11 +124,12 @@ export const ProductDetailsPage = () => {
           Add to Cart
         </Button>
         <hr className="my-14 border-gray-300" />
-        <div>
+        <div className="flex items-center justify-between mb-6">
           <span className="font-poppins block font-normal text-[#10151F] text-lg">Details</span>
-          <span>Brand:{product.brand.name}</span>
+          <img src={product.brand.image} alt={product.brand.name} width={38} height={38} />
         </div>
-        <p>{product.description}</p>
+        <span className="text-[#3E424A] mb-5 block">Brand: {product.brand.name}</span>
+        <p className="text-[#3E424A]">{product.description || "No description"}</p>
       </div>
     </div>
   );
