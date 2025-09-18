@@ -8,7 +8,7 @@ export const ProductCard = (product: IProduct) => {
     <NavLink to={`/products/${product.id}`} className="w-[412px]">
       {product.images && (
         <img
-          src={product.images[0]}
+          src={product.cover_image}
           alt={product.name}
           className="w-full h-[549px] object-cover rounded"
         />

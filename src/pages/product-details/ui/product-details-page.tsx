@@ -14,7 +14,8 @@ export const ProductDetailsPage = () => {
     (async () => {
       if (id) {
         const response = await client(`/products/${id}`);
-        console.log(response);
+        console.log("response",response);
+        console.log("data",response.data)
         setProduct(response.data);
       }
     })();
