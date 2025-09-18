@@ -3,7 +3,8 @@ import { paths } from "../../shared/constants";
 import { SignInPage } from "../../pages/sign-in";
 import { SignUpPage } from "../../pages/sign-up";
 import { ProductsPage } from "../../pages/products";
-import { CheckoutPage } from "../../pages/checkout/checkout-page";
+import { CheckoutPage } from "../../pages/checkout";
+
 
 const router = createBrowserRouter([
   {
