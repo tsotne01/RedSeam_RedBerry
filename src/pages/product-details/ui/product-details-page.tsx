@@ -4,24 +4,37 @@ import type { IProduct } from "../../../shared/models";
 import { client } from "../../../shared/api";
 import { Button } from "../../../shared/ui";
 
+import cartIcon from "../../../assets/icons/cart_icon.svg"
+
 export const ProductDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
   const [product, setProduct] = useState<IProduct | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [currentColor, setCurrentColor] = useState<string | null>(null);
   const [currentSize, setCurrentSize] = useState<string | null>(null);
+  const [isPending, setIsPending] = useState<boolean>(false);
   useEffect(() => {
     (async () => {
       if (id) {
-        const response = await client(`/products/${id}`);
-        console.log("response", response);
-        console.log("data", response.data)
-        setProduct(response.data);
+        try {
+          setIsPending(true);
+          const response = await client(`/products/${id}`);
+          console.log("response", response);
+          console.log("data", response.data)
+          setProduct(response.data);
+        } catch (error) {
+          console.log(error);
+        } finally {
+          setIsPending(false);
+        }
       }
     })();
   }, [id]);
+  if (!product && isPending) {
+    return <div>...loading</div>
+  }
   if (!product) {
-    return <div>Loading...</div>;
+    return <div>No Products Found...</div>;
   }
   return (
     <div className="flex gap-[168px]">
@@ -120,7 +133,7 @@ export const ProductDetailsPage = () => {
             ))}
           </select>
         </div>
-        <Button variant="primary" size="large" className="mb-12 w-full">
+        <Button variant="primary" size="large" className="mb-12 w-full" icon={<img src={cartIcon} alt="cart" />}>
           Add to Cart
         </Button>
         <hr className="my-14 border-gray-300" />

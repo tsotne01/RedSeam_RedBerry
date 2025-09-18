@@ -9,8 +9,18 @@ import arrowRight from "../../../assets/icons/arrow_right.svg";
 
 type TSortingOptions = "price" | "-price" | "created_at" | "-created_at";
 
+interface IProductsMetadata {
+  current_page: number;
+  last_page: number;
+  from: number;
+  to: number;
+  total: number;
+  per_page: number;
+}
+
 export const ProductsPage = () => {
   const [products, setProducts] = useState<IProduct[] | null>(null);
+  const [productsMetaData, setProductsMetaData] = useState<IProductsMetadata>()
   const [page, setPage] = useState(1);
   const [filterOptions, setFilterOptions] = useState<{
     price_from: number;
@@ -41,7 +51,8 @@ export const ProductsPage = () => {
           },
         },
       });
-      console.log(response);
+      console.log("Response with meta data", response);
+      setProductsMetaData(response.data.meta)
       setProducts(response.data.data);
     })();
   }, [filterOptions, page, sortOption]);
@@ -52,6 +63,7 @@ export const ProductsPage = () => {
         <h1 className="font-semibold font-poppins text-[#10151F] text-[42px]">
           Products Page
         </h1>
+        <span>Showing {productsMetaData && (productsMetaData?.current_page - 1) * productsMetaData?.per_page}-{productsMetaData && (productsMetaData?.current_page - 1) * productsMetaData?.per_page + productsMetaData.per_page} of {productsMetaData?.total} results</span>
         <div className="flex gap-2 items-center">
           <div className="relative">
             <button onClick={() => setFilterOpen((prev) => !prev)}>Filter</button>
@@ -70,11 +82,13 @@ export const ProductsPage = () => {
                       className="rounded-lg border-1 border-[#E1DFE1] px-3 py-2.5"
                       value={tempFilterOptions.price_from}
                       placeholder="*from"
-                      onChange={(e) =>
+                      onChange={(e) => {
+                        setPage(1)
                         setTempFilterOptions((prev) => ({
                           ...prev,
                           price_from: e.target.value,
                         }))
+                      }
                       }
                     />
                     <label htmlFor="price_to"></label>
@@ -85,11 +99,13 @@ export const ProductsPage = () => {
                       className="rounded-lg border-1 border-[#E1DFE1] px-3 py-2.5"
                       placeholder="*to"
                       value={tempFilterOptions.price_to}
-                      onChange={(e) =>
+                      onChange={(e) => {
+                        setPage(1)
                         setTempFilterOptions((prev) => ({
                           ...prev,
                           price_to: e.target.value,
                         }))
+                      }
                       }
                     />
                   </div>
@@ -152,7 +168,8 @@ export const ProductsPage = () => {
           <img src={arrowLeft} alt="Previous" className="w-4 h-4" />
         </button>
         {(() => {
-          const totalPages = 10; // TODO: replace with real total from API when available
+          const totalPages = productsMetaData?.last_page;
+          if (!totalPages) return;
           const current = page;
           const numbers = new Set<number>();
 
