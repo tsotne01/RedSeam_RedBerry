@@ -41,10 +41,16 @@ export const ProductFilter = ({
     const priceFromNum = priceFrom === "" ? undefined : Number(priceFrom);
     const priceToNum = priceTo === "" ? undefined : Number(priceTo);
 
-    if (priceFromNum !== undefined || priceToNum !== undefined) {
+    // Prevent setting only one filter - both from and to must be provided or both empty
+    if ((priceFromNum !== undefined && priceToNum === undefined) || 
+        (priceFromNum === undefined && priceToNum !== undefined)) {
+      return;
+    }
+
+    if (priceFromNum !== undefined && priceToNum !== undefined) {
       const newFilters: IFilterOptions = {
-        price_from: priceFromNum || 0,
-        price_to: priceToNum || Infinity,
+        price_from: priceFromNum,
+        price_to: priceToNum,
       };
       onFilterChange(newFilters);
     } else {
