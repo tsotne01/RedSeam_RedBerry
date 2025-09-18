@@ -4,6 +4,5 @@ const client = axios.create({
   baseURL: "https://api.redseam.redberryinternship.ge/api",
   timeout: 1000,
   headers: { "Content-Type": "application/json" },
-  withCredentials: true,
 });
 export { client };

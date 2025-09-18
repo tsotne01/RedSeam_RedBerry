@@ -1,0 +1,31 @@
+import { NavLink } from "react-router";
+
+interface IProduct {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  images: string[];
+}
+
+export const ProductCard = (product: IProduct) => {
+  return (
+    <NavLink to={`/products/${product.id}`} className="w-[412px]">
+      {product.images && (
+        <img
+          src={product.images[0]}
+          alt={product.name}
+          className="w-full h-[549px] object-cover rounded"
+        />
+      )}
+      <div className="mt-3 flex flex-col gap-1">
+        <h2 className="font-medium font-poppins text-lg text-[#10151F]">
+          {product.name}
+        </h2>
+        <p className="text-[16px] font-poppins text-[#10151F] font-medium">
+          ${product.price}
+        </p>
+      </div>
+    </NavLink>
+  );
+};
