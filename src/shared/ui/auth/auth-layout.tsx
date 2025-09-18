@@ -1,6 +1,13 @@
 import type { ReactNode } from "react";
 import authImage from "../../../assets/auth/auth_photo.png";
+import { useAuth } from "../../hooks/use-auth";
+import { Navigate } from "react-router";
+import { paths } from "../../constants";
 export const AuthLayout = ({ children }: { children: ReactNode }) => {
+  const { isAuthenticated } = useAuth();
+  if (isAuthenticated) {
+    return <Navigate to={paths.products} replace />;
+  }
   return (
     <div className="flex justify-end items-center h-full">
       <div>

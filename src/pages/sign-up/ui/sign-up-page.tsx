@@ -1,12 +1,12 @@
 import { useForm } from "react-hook-form";
 import { AuthLayout, Button } from "../../../shared/ui";
-import { client } from "../../../shared/api";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import defaultAvatar from "../../../assets/auth/default_avatar.png";
 import { paths } from "../../../shared/constants";
 import { Link } from "react-router";
+import { useAuth } from "../../../shared/hooks/use-auth";
 
 const signUpSchema = z
   .object({
@@ -26,6 +26,7 @@ const signUpSchema = z
 type SignUpForm = z.infer<typeof signUpSchema>;
 
 export const SignUpPage = () => {
+  const { register: registerUser } = useAuth();
   const {
     register,
     handleSubmit,
@@ -36,24 +37,15 @@ export const SignUpPage = () => {
   const [avatarPreview, setAvatarPreview] = useState<File | null>(null);
   const onSubmit = async (data: SignUpForm) => {
     try {
-      const user = await client.post(
-        "/register",
-        {
-          username: data.username,
-          email: data.email,
-          password: data.password,
-          password_confirmation: data.confirmPassword,
-          avatar: avatarPreview,
-        },
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      console.log(user);
+      await registerUser({
+        username: data.username,
+        email: data.email,
+        password: data.password,
+        passwordConfirmation: data.confirmPassword,
+        avatar: avatarPreview ?? undefined,
+      });
     } catch (error) {
-      console.error("Upload failed:", error);
+      console.error("Registration failed:", error);
     }
   };
   return (

@@ -1,10 +1,10 @@
 import { useForm } from "react-hook-form";
 import { AuthLayout, Button } from "../../../shared/ui";
-import { client } from "../../../shared/api";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "react-router";
 import { paths } from "../../../shared/constants";
+import { useAuth } from "../../../shared/hooks/use-auth";
 
 const signInSchema = z.object({
   identifier: z
@@ -16,6 +16,7 @@ const signInSchema = z.object({
 type SignInForm = z.infer<typeof signInSchema>;
 
 export const SignInPage = () => {
+  const { login } = useAuth();
   const {
     register,
     handleSubmit,
@@ -26,11 +27,7 @@ export const SignInPage = () => {
 
   const onSubmit = async (data: SignInForm) => {
     try {
-      const res = await client.post("/login", {
-        email: data.identifier,
-        password: data.password,
-      });
-      console.log(res);
+      await login(data.identifier, data.password);
     } catch (error) {
       console.error("Login failed:", error);
     }

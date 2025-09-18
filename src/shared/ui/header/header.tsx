@@ -1,7 +1,10 @@
 import { NavLink, Outlet } from "react-router";
 import logo from "../../../assets/logo/redseam_logo.svg";
 import userIcon from "../../../assets/icons/user_icon.png";
+import defaulProfileIcon from "../../../assets/auth/default_avatar.png"
+import { useAuth } from "../../hooks/use-auth";
 export const Header = () => {
+  const { isAuthenticated, user } = useAuth();
   return (
     <div className="h-screen">
       <header className="flex items-center justify-between px-[100px] h-20">
@@ -12,13 +15,19 @@ export const Header = () => {
           </span>
         </NavLink>
         <div>
-          <NavLink
-            to={"/sign-in"}
-            className="text-[#10151F] font-medium text-sm flex gap-2 items-center"
-          >
-            <img src={userIcon} alt="User Icon" width={13} height={16} />
-            <span className="text-sm font-medium text-[#10151F]">Log In</span>
-          </NavLink>
+          {!isAuthenticated ? (
+            <NavLink
+              to={"/sign-in"}
+              className="text-[#10151F] font-medium text-sm flex gap-2 items-center"
+            >
+              <img src={userIcon} alt="User Icon" width={13} height={16} />
+              <span className="text-sm font-medium text-[#10151F]">Log In</span>
+            </NavLink>
+          ) : (
+            <>
+              <img src={user?.profile_photo || defaulProfileIcon} alt="profile" className="w-[38px] h-[38px] rounded-full" />
+            </>
+          )}
         </div>
       </header>
       <main className="px-[100px] py-7 h-full">
