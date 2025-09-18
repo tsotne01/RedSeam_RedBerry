@@ -1,9 +1,10 @@
 import noItemsImage from "../../../assets/no_items_in_cart.png";
-import { Button } from "../../../shared/ui/button/button";
+import { Button, CartItem, OrderSummary } from "../../../shared/ui";
 import { useNavigate } from "react-router";
 import { useCart, type ICartItem } from "../hooks/use-cart";
 
 import closeIcon from "../../../assets/icons/close_icon.png"
+import { paths } from "../../../shared/constants";
 
 export const CartWidget = ({ onClose }: { onClose: () => void }) => {
   const navigate = useNavigate();
@@ -22,9 +23,9 @@ export const CartWidget = ({ onClose }: { onClose: () => void }) => {
         className="fixed top-0 right-0 w-full h-full z-10 bg-[#10151F]/70"
         onClick={onClose}
       ></div>
-      <div className="fixed top-0 right-0 bg-white z-20 w-1/3 h-full flex flex-col justify-between p-[40px]">
+      <div className="fixed top-0 right-0 bg-white z-20 w-1/3 h-fit h-full flex flex-col justify-between p-[40px]">
         <div>
-          <div className="flex justify-between items-center mb-[151px]">
+          <div className="flex justify-between items-center">
             <h2 className="font-poppins text-[#10151F] font-semibold">Shopping cart ({totalQuantity})</h2>
             <div className="flex items-center gap-3">
               <button className="text-black cursor-pointer" onClick={onClose}>
@@ -49,78 +50,37 @@ export const CartWidget = ({ onClose }: { onClose: () => void }) => {
               </Button>
             </div>
           )}
-          {cartItems && totalQuantity > 0 &&
-            cartItems.map((item: ICartItem) => (
-              <div className="flex items-center gap-[17px] mt-[63px]" key={`${item.id}-${item.selectedColor}-${item.selectedSize}`}>
-                <div>
-                  <img
-                    className="w-[100px] height-[134px] rounded-[10px] border-1 border-[#E1DFE1]"
-                    src={item.selectedImage}
-                    alt={item.name}
-                  />
-                </div>
-                <div className="flex flex-col">
-                  <div>
-                    <h3 className="mb-[10px]">{item.name}</h3>
-                    <span className="block">{item.selectedColor}</span>
-                    <span className="block">{item.selectedSize}</span>
-                  </div>
-                  <div className="flex justify-between w-full">
-                    <div className="flex items-center gap-2">
-                      <button
-                        className="w-6 h-6 border-1 border-[#E1DFE1] rounded"
-                        onClick={() =>
-                          decrementCartItemQuantity(item.id, {
-                            color: item.selectedColor,
-                            size: item.selectedSize,
-                          })
-                        }
-                      >
-                        -
-                      </button>
-                      <span className="min-w-[16px] text-center">{item.quantity}</span>
-                      <button
-                        className="w-6 h-6 border-1 border-[#E1DFE1] rounded"
-                        onClick={() =>
-                          incrementCartItemQuantity(item.id, {
-                            color: item.selectedColor,
-                            size: item.selectedSize,
-                          })
-                        }
-                      >
-                        +
-                      </button>
-                    </div>
-                    <button
-                      onClick={() =>
-                        removeFromCart(item.id, {
-                          color: item.selectedColor,
-                          size: item.selectedSize,
-                        })
-                      }
-                    >
-                      Remove
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
+          <div className="overflow-y-scroll h-full max-h-[450px]">
+            {cartItems && totalQuantity > 0 &&
+              cartItems.map((item: ICartItem) => (
+                <CartItem
+                  key={`${item.id}-${item.selectedColor}-${item.selectedSize}`}
+                  id={item.id}
+                  name={item.name}
+                  price={item.price}
+                  selectedColor={item.selectedColor}
+                  selectedSize={item.selectedSize}
+                  selectedImage={item.selectedImage}
+                  quantity={item.quantity}
+                  onIncrement={incrementCartItemQuantity}
+                  onDecrement={decrementCartItemQuantity}
+                  onRemove={removeFromCart}
+                  className="mt-[63px]"
+                />
+              ))}
+          </div>
         </div>
         {totalQuantity > 0 && (
-          <div className="flex flex-col gap-[16px]">
-            <div className="flex justify-between items-center font-poppins">
-              <span>Items subtotal</span>
-              <span>${subtotalPrice}</span>
-            </div>
-            <div className="flex justify-between items-center font-poppins">
-              <span>Delivery</span>
-              <span>$5</span>
-            </div>
-            <div className="flex justify-between items-center text-[#10151F] text-xl mb-[102px] font-poppins">
-              <span>Total</span>
-              <span>${subtotalPrice + 5}</span>
-            </div>
-            <Button variant="primary" size="large">Go to checkout</Button>
+          <div className="flex flex-col">
+            <OrderSummary
+              subtotal={subtotalPrice}
+              deliveryCost={5}
+              className="mb-[102px]"
+            />
+            <Button onClick={() => {
+              onClose();
+              navigate(paths.checkout)
+            }} variant="primary" size="large">Go to checkout</Button>
           </div>
         )}
       </div>

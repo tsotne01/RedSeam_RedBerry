@@ -1,6 +1,8 @@
 import { useState, useCallback, useMemo } from "react";
 import { Button } from "../../../shared/ui";
 
+import filterIcon from "../../../assets/icons/filter_icon.svg"
+
 export type TSortingOptions = "price" | "-price" | "created_at" | "-created_at";
 
 export interface IFilterOptions {
@@ -42,8 +44,8 @@ export const ProductFilter = ({
     const priceToNum = priceTo === "" ? undefined : Number(priceTo);
 
     // Prevent setting only one filter - both from and to must be provided or both empty
-    if ((priceFromNum !== undefined && priceToNum === undefined) || 
-        (priceFromNum === undefined && priceToNum !== undefined)) {
+    if ((priceFromNum !== undefined && priceToNum === undefined) ||
+      (priceFromNum === undefined && priceToNum !== undefined)) {
       return;
     }
 
@@ -79,9 +81,12 @@ export const ProductFilter = ({
 
       {/* Filter Dropdown */}
       <div className="relative">
-        <button onClick={handleFilterToggle}>Filter</button>
+        <button className="cursor-pointer flex gap-4 font-poppins text-base text-[#10151F]" onClick={handleFilterToggle}>
+          <img src={filterIcon} alt="filter" />
+          <span>Filter</span>
+        </button>
         {isOpen && (
-          <div className="absolute z-10 -translate-x-[90%] border-1 border-[#E1DFE1] bg-white rounded-lg p-5 flex flex-col gap-5">
+          <div className="absolute z-10 -translate-x-[95%] border-1 border-[#E1DFE1] bg-white rounded-lg p-5 flex flex-col gap-5">
             <h2 className="font-poppins font-semibold text-base">
               Select price
             </h2>
@@ -109,7 +114,7 @@ export const ProductFilter = ({
             </div>
             <Button
               size="small"
-              className="w-fit"
+              className="w-[124px]"
               onClick={handleApplyFilters}
             >
               Apply

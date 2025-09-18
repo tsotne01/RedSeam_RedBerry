@@ -48,7 +48,7 @@ export const ProductDetailsPage = () => {
     if (!currentSize && defaultSizes.length > 0) {
       setCurrentSize(defaultSizes[0]);
     }
-  }, [product]);
+  }, [product, currentColor, currentSize]);
   if (!product && isPending) {
     return <div>...loading</div>
   }

@@ -1,7 +1,12 @@
-import React from 'react'
 import type { IProduct } from '../../../shared/models'
 
-export const ProductImages = ({ product, onPhotoChange, imageIndex }: { product: IProduct; onPhotoChange: (index: number) => void; imageIndex: number }) => {
+interface IProductImages {
+    product: IProduct;
+    onPhotoChange: (index: number) => void;
+    imageIndex: number;
+}
+
+export const ProductImages = ({ product, onPhotoChange, imageIndex }: IProductImages) => {
     return (
         <>
             <div className="flex flex-col gap-3">
