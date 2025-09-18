@@ -2,6 +2,8 @@
 import { createContext, useCallback, useContext, useMemo, type ReactNode } from "react";
 import { toast } from "react-hot-toast";
 import { useLocallyStoredState } from "../../../shared/hooks/use-locally-stored-state";
+import { client } from "../../../shared/api";
+import { ZodError } from "zod";
 
 export interface ICartItem {
     id: string;
@@ -32,38 +34,71 @@ const STORAGE_KEY = "cart_items";
 export const CartProvider = ({ children }: { children: ReactNode }) => {
     const [cartItems, setCartItems, clearStorage] = useLocallyStoredState<ICartItem[]>(STORAGE_KEY, []);
 
-    const addToCart = useCallback((payload: { id: string; name: string; price: number; selectedColor: string; selectedSize: string; selectedImage: string; quantity?: number }) => {
+    const addToCart = useCallback(async (payload: { id: string; name: string; price: number; selectedColor: string; selectedSize: string; selectedImage: string; quantity?: number }) => {
         const { id, name, price, selectedColor, selectedSize, selectedImage } = payload;
         const quantityToAdd = Math.max(1, payload?.quantity ?? 1);
-        setCartItems((prev) => {
-            const idx = prev.findIndex(it => it.id === id && it.selectedColor === selectedColor && it.selectedSize === selectedSize);
-            if (idx === -1) {
-                return [
-                    ...prev,
-                    {
-                        id,
-                        name,
-                        price,
-                        quantity: quantityToAdd,
-                        selectedColor,
-                        selectedSize,
-                        selectedImage,
-                    },
-                ];
+        try {
+            const response = await client.post(`/cart/products/${id}`, {
+                color: selectedColor,
+                size: selectedSize,
+                quantity: quantityToAdd
+            })
+            console.log(response);
+            toast.success("Added to cart");
+            setCartItems((prev) => {
+                const idx = prev.findIndex(it => it.id === id && it.selectedColor === selectedColor && it.selectedSize === selectedSize);
+                if (idx === -1) {
+                    return [
+                        ...prev,
+                        {
+                            id,
+                            name,
+                            price,
+                            quantity: quantityToAdd,
+                            selectedColor,
+                            selectedSize,
+                            selectedImage,
+                        },
+                    ];
+                }
+                const updated = [...prev];
+                const newQty = updated[idx].quantity + quantityToAdd;
+                updated[idx] = { ...updated[idx], quantity: newQty };
+                return updated;
+            });
+        } catch (error) {
+            if (error instanceof ZodError) {
+                toast.error("Failed to add to cart: " + error.message);
+                return;
             }
-            const updated = [...prev];
-            const newQty = updated[idx].quantity + quantityToAdd;
-            updated[idx] = { ...updated[idx], quantity: newQty };
-            return updated;
-        });
-        toast.success("Added to cart");
+            toast.error("Failed to add to cart");
+        }
     }, [setCartItems]);
 
-    const incrementCartItemQuantity = useCallback((productId: string, options: { color: string; size: string }, step: number = 1) => {
-        setCartItems((prev) => prev.map((it) => it.id === productId && it.selectedColor === options.color && it.selectedSize === options.size
-            ? { ...it, quantity: it.quantity + Math.max(1, step) }
-            : it
-        ));
+    const incrementCartItemQuantity = useCallback(async (productId: string, options: { color: string; size: string }, step: number = 1) => {
+        try {
+
+
+            setCartItems((prev) => prev.map((it) => {
+                if (it.id === productId && it.selectedColor === options.color && it.selectedSize === options.size) {
+                    (async () => {
+                        await client.patch(`/cart/products/${productId}`, {
+                            quantity: it.quantity + Math.max(1, step)
+                        })
+                    })()
+                }
+                return it.id === productId && it.selectedColor === options.color && it.selectedSize === options.size
+                    ? { ...it, quantity: it.quantity + Math.max(1, step) }
+                    : it
+
+            }));
+        } catch (error) {
+            if (error instanceof ZodError) {
+                toast.error("Failed to increment cart item quantity: " + error.message);
+                return;
+            }
+            toast.error("Failed to increment cart item quantity");
+        }
     }, [setCartItems]);
 
     const decrementCartItemQuantity = useCallback((productId: string, options: { color: string; size: string }, step: number = 1) => {
