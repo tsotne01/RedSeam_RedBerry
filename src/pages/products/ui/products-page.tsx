@@ -63,7 +63,7 @@ export const ProductsPage = () => {
         <h1 className="font-semibold font-poppins text-[#10151F] text-[42px]">
           Products Page
         </h1>
-        <span>Showing {productsMetaData && (productsMetaData?.current_page - 1) * productsMetaData?.per_page}-{productsMetaData && (productsMetaData?.current_page - 1) * productsMetaData?.per_page + productsMetaData.per_page} of {productsMetaData?.total} results</span>
+        <span>Showing {productsMetaData && productsMetaData.from}-{productsMetaData && productsMetaData.to} of {productsMetaData?.total} results</span>
         <div className="flex gap-2 items-center">
           <div className="relative">
             <button onClick={() => setFilterOpen((prev) => !prev)}>Filter</button>

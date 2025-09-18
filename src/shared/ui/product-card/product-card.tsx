@@ -5,12 +5,12 @@ import type { IProduct } from "../../models";
 
 export const ProductCard = (product: IProduct) => {
   return (
-    <NavLink to={`/products/${product.id}`} className="w-[412px]">
+    <NavLink to={`/products/${product.id}`}>
       {product.images && (
         <img
           src={product.cover_image}
           alt={product.name}
-          className="w-full h-[549px] object-cover rounded"
+          className="max-w-[420px] h-[549px] object-cover rounded"
         />
       )}
       <div className="mt-3 flex flex-col gap-1">
