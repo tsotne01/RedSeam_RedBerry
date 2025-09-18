@@ -122,6 +122,11 @@ export const ProductDetailsPage = () => {
         <Button variant="primary" size="large" className="mb-12 w-full">
           Add to Cart
         </Button>
+        <hr className="my-14 border-gray-300" />
+        <div>
+          <span className="font-poppins block font-normal text-[#10151F] text-lg">Details</span>
+          <span>Brand:{product.brand.name}</span>
+        </div>
         <p>{product.description}</p>
       </div>
     </div>

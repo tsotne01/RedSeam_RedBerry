@@ -7,4 +7,12 @@ export interface IProduct {
   images: string[];
   available_sizes: string[];
   cover_image: string;
+  quantity: number;
+  brand: {
+    id: string;
+    name: string;
+    image: string;
+  };
+  release_date: string;
+  total_price: number;
 }

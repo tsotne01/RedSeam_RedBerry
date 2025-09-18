@@ -141,7 +141,7 @@ export const ProductsPage = () => {
           </div>
         </div>
       </div>
-      <div className="flex flex-wrap gap-10 mt-10">
+      <div className="flex flex-wrap gap-[24px] mt-10">
         {products &&
           products.map((product: IProduct) => (
             <ProductCard key={product.id} {...product} />

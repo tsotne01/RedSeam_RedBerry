@@ -4,6 +4,9 @@ import { client } from "../../../shared/api";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
+import defaultAvatar from "../../../assets/auth/default_avatar.png";
+import { paths } from "../../../shared/constants";
+import { Link } from "react-router";
 
 const signUpSchema = z
   .object({
@@ -20,19 +23,21 @@ const signUpSchema = z
     path: ["confirmPassword"],
   });
 
+type SignUpForm = z.infer<typeof signUpSchema>;
+
 export const SignUpPage = () => {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm({
+  } = useForm<SignUpForm>({
     resolver: zodResolver(signUpSchema),
   });
   const [avatarPreview, setAvatarPreview] = useState<File | null>(null);
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: SignUpForm) => {
     try {
       const user = await client.post(
-        "register",
+        "/register",
         {
           username: data.username,
           email: data.email,
@@ -58,7 +63,7 @@ export const SignUpPage = () => {
           <label htmlFor="profile-pic" className="text-sm font-medium flex items-center gap-4">
             <img
               className="w-[80px] h-[80px] rounded-full"
-              src={avatarPreview ? URL.createObjectURL(avatarPreview) : ""}
+              src={avatarPreview ? URL.createObjectURL(avatarPreview) : defaultAvatar}
               alt="avatar"
             />
             <input
@@ -87,7 +92,7 @@ export const SignUpPage = () => {
             {...register("username")}
           />
         </label>
-        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+        <label className="block mb-2 text-sm font-medium text-gray-900 ">
           <input
             type="email"
             className="w-[554px] h-[42px] rounded-[8px] border border-[#E1DFE1] px-3 bg-white"
@@ -98,7 +103,7 @@ export const SignUpPage = () => {
             <p className="text-red-500">{errors?.email?.message}</p>
           )}
         </label>
-        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+        <label className="block mb-2 text-sm font-medium text-gray-900 ">
           <input
             type="password"
             className="w-[554px] h-[42px] rounded-[8px] border border-[#E1DFE1] px-3 bg-white"
@@ -109,7 +114,7 @@ export const SignUpPage = () => {
             <p className="text-red-500">{errors?.password?.message}</p>
           )}
         </label>
-        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+        <label className="block mb-2 text-sm font-medium text-gray-900 ">
           <input
             type="password"
             className="w-[554px] h-[42px] rounded-[8px] border border-[#E1DFE1] px-3 bg-white"
@@ -123,7 +128,11 @@ export const SignUpPage = () => {
         <Button type="submit" size="large" className="mb-12 w-full">
           Sign Up
         </Button>
+        <div className="w-full text-center text-sm">
+          <span className="text-[#10151F]">Already member? </span>
+          <Link to={paths.signIn} className="text-[#FF4000]">Login</Link>
+        </div>
       </form>
-    </AuthLayout>
+    </AuthLayout >
   );
 };
