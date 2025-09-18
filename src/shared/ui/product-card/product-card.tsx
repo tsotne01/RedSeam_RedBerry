@@ -5,7 +5,7 @@ import type { IProduct } from "../../models";
 
 export const ProductCard = (product: IProduct) => {
   return (
-    <NavLink to={`/products/${product.id}`}>
+    <NavLink className={"shadow-sm p-2.5 rounded-2xl"} to={`/products/${product.id}`}>
       {product.images && (
         <img
           src={product.cover_image}

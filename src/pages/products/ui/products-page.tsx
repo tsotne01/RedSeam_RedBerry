@@ -51,7 +51,6 @@ export const ProductsPage = () => {
           },
         },
       });
-      console.log("Response with meta data", response);
       setProductsMetaData(response.data.meta)
       setProducts(response.data.data);
     })();
@@ -63,8 +62,9 @@ export const ProductsPage = () => {
         <h1 className="font-semibold font-poppins text-[#10151F] text-[42px]">
           Products Page
         </h1>
-        <span>Showing {productsMetaData && productsMetaData.from}-{productsMetaData && productsMetaData.to} of {productsMetaData?.total} results</span>
         <div className="flex gap-2 items-center">
+          <span className="text-sm text-[#3E424A]">Showing {productsMetaData && productsMetaData.from}-{productsMetaData && productsMetaData.to} of {productsMetaData?.total} results</span>
+          <div className="bg-[#E1DFE1] mx-3 min-h-[20px] w-[1px]" />
           <div className="relative">
             <button onClick={() => setFilterOpen((prev) => !prev)}>Filter</button>
             <div>

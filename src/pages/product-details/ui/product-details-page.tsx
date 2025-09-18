@@ -1,26 +1,32 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useParams, useNavigate } from "react-router";
 import type { IProduct } from "../../../shared/models";
 import { client } from "../../../shared/api";
 import { Button } from "../../../shared/ui";
+import toast from "react-hot-toast";
 
 import cartIcon from "../../../assets/icons/cart_icon.svg"
+import { useAuth } from "../../../shared/hooks/use-auth";
+import { paths } from "../../../shared/constants";
+import { useCart } from "../../../widgets/cart/hooks/use-cart";
 
 export const ProductDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const [product, setProduct] = useState<IProduct | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [currentColor, setCurrentColor] = useState<string | null>(null);
   const [currentSize, setCurrentSize] = useState<string | null>(null);
+  const [quantity, setQuantity] = useState<number>(1);
   const [isPending, setIsPending] = useState<boolean>(false);
+  const { addToCart } = useCart()
   useEffect(() => {
     (async () => {
       if (id) {
         try {
           setIsPending(true);
           const response = await client(`/products/${id}`);
-          console.log("response", response);
-          console.log("data", response.data)
           setProduct(response.data);
         } catch (error) {
           console.log(error);
@@ -30,12 +36,52 @@ export const ProductDetailsPage = () => {
       }
     })();
   }, [id]);
+  // Initialize default selections when product loads
+  useEffect(() => {
+    if (!product) return;
+    if (!currentColor && product.available_colors && product.available_colors.length > 0) {
+      setCurrentColor(product.available_colors[0]);
+      setCurrentImageIndex(0);
+    }
+    const defaultSizes = product.available_sizes && product.available_sizes.length > 0 ? product.available_sizes : ["XS", "S", "M", "L", "XL"];
+    if (!currentSize && defaultSizes.length > 0) {
+      setCurrentSize(defaultSizes[0]);
+    }
+  }, [product]);
   if (!product && isPending) {
     return <div>...loading</div>
   }
   if (!product) {
     return <div>No Products Found...</div>;
   }
+
+
+  const addItemToCart = () => {
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      toast.error("Please sign in to add items to your cart");
+      navigate(paths.signIn);
+      return;
+    }
+
+    if (!currentColor || !currentSize) {
+      toast.error("Please select color and size");
+      return;
+    }
+
+    addToCart({
+      id: product!.id,
+      name: product!.name,
+      price: product!.price,
+      selectedColor: currentColor,
+      selectedSize: currentSize,
+      selectedImage: product!.images[currentImageIndex],
+      quantity: quantity,
+    });
+  };
+  const fallbackSizes = ["XS", "S", "M", "L", "XL"];
+  const sizes = product.available_sizes && product.available_sizes.length > 0 ? product.available_sizes : fallbackSizes;
+
   return (
     <div className="flex gap-[168px]">
       <div className="flex gap-2">
@@ -95,27 +141,24 @@ export const ProductDetailsPage = () => {
               ))}
           </div>
         </div>
-        {product.available_sizes && (
-          <div className="mb-12">
-            <span className="font-poppins text-[#10151F] text-base font-normal inline-block mb-4">
-              Color: {currentColor}
-            </span>
-            <div>
-              {product.available_sizes.map((size) => (
-                <button
-                  type="button"
-                  key={size}
-                  className={`w-[38px] h-[38px] border border-gray-300 rounded-full inline-block ml-3 ${currentSize === size
-                    ? "ring-2 ring-offset-4 ring-[#E1DFE1]"
-                    : ""
-                    }`}
-                  onClick={() => setCurrentSize(size)}
-                  aria-label={size}
-                ></button>
-              ))}
-            </div>
+        <div className="mb-12">
+          <span className="font-poppins text-[#10151F] text-base font-normal inline-block mb-4">
+            Size: {currentSize ?? "Select a size"}
+          </span>
+          <div className="flex flex-wrap gap-[10px]">
+            {sizes.map((size) => (
+              <button
+                type="button"
+                key={size}
+                className={`w-[70px] h-[42px] rounded-[10px] border-1 border-[#E1DFE1] px-4 py-[9px] text-sm font-medium ${
+                  currentSize === size ? "border-[#FF4000] text-[#10151F]" : "text-[#3E424A]"
+                }`}
+                onClick={() => setCurrentSize(size)}
+                aria-label={size}
+              >{size.toUpperCase()}</button>
+            ))}
           </div>
-        )}
+        </div>
         <div className="flex flex-col gap-3.5 mb-12">
           <span className="inline-block mb-4 font-poppins font-normal">
             Quantity
@@ -125,15 +168,20 @@ export const ProductDetailsPage = () => {
             title="quantity"
             name="quantity"
             id="quantity"
+            value={quantity}
+            onChange={(e) => setQuantity(Number(e.target.value))}
           >
-            {Array.from({ length: product.quantity || 5 }).map((qty, index) => (
-              <option key={index} value={index}>
-                {index}
-              </option>
-            ))}
+            {Array.from({ length: Math.max(1, product.quantity || 5) }).map((_, index) => {
+              const val = index + 1;
+              return (
+                <option key={val} value={val}>
+                  {val}
+                </option>
+              );
+            })}
           </select>
         </div>
-        <Button variant="primary" size="large" className="mb-12 w-full" icon={<img src={cartIcon} alt="cart" />}>
+        <Button onClick={addItemToCart} disabled={!currentColor || !currentSize} variant="primary" size="large" className="mb-12 w-full" icon={<img src={cartIcon} alt="cart" />}>
           Add to Cart
         </Button>
         <hr className="my-14 border-gray-300" />
