@@ -9,6 +9,7 @@ import cartIcon from "../../../assets/icons/cart_icon.svg"
 import { useAuth } from "../../../shared/hooks/use-auth";
 import { paths } from "../../../shared/constants";
 import { useCart } from "../../../widgets/cart/hooks/use-cart";
+import { ProductImages } from "../../../widgets/product-images";
 
 export const ProductDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -85,28 +86,7 @@ export const ProductDetailsPage = () => {
   return (
     <div className="flex gap-[168px]">
       <div className="flex gap-2">
-        <div className="flex flex-col gap-3">
-          {product.images &&
-            product.images.map((img, idx) => (
-              <button onClick={() => setCurrentImageIndex(idx)} key={img}>
-                <img
-                  className="w-[121px] h-[161px]"
-                  key={img}
-                  src={img}
-                  alt={product.name}
-                />
-              </button>
-            ))}
-        </div>
-        <div>
-          {product.images && (
-            <img
-              className="w-[492px] h-[656px] object-cover rounded"
-              src={product.images[currentImageIndex]}
-              alt={product.name}
-            />
-          )}
-        </div>
+        <ProductImages product={product} onPhotoChange={setCurrentImageIndex} imageIndex={currentImageIndex} />
       </div>
       <div className="w-1/2">
         <div className="mb-14">
@@ -150,9 +130,8 @@ export const ProductDetailsPage = () => {
               <button
                 type="button"
                 key={size}
-                className={`w-[70px] h-[42px] rounded-[10px] border-1 border-[#E1DFE1] px-4 py-[9px] text-sm font-medium ${
-                  currentSize === size ? "border-[#FF4000] text-[#10151F]" : "text-[#3E424A]"
-                }`}
+                className={`w-[70px] h-[42px] rounded-[10px] border-1 border-[#E1DFE1] px-4 py-[9px] text-sm font-medium ${currentSize === size ? "border-[#FF4000] text-[#10151F]" : "text-[#3E424A]"
+                  }`}
                 onClick={() => setCurrentSize(size)}
                 aria-label={size}
               >{size.toUpperCase()}</button>
