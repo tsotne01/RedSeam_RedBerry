@@ -6,6 +6,7 @@ import { useCart, type ICartItem } from "../hooks/use-cart";
 import closeIcon from "../../../assets/icons/close_icon.png"
 import { paths } from "../../../shared/constants";
 
+
 export const CartWidget = ({ onClose }: { onClose: () => void }) => {
   const navigate = useNavigate();
   const {
@@ -16,6 +17,7 @@ export const CartWidget = ({ onClose }: { onClose: () => void }) => {
     decrementCartItemQuantity,
     removeFromCart,
   } = useCart();
+
 
   return (
     <>
