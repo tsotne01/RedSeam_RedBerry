@@ -63,14 +63,11 @@ export const CheckoutPage = () => {
   });
 
   const onSubmit = async (data: CheckoutFormData) => {
-    console.log("Form submitted with data:", data);
     try {
-      console.log("Order data:", data);
       const resp = await client.post("/cart/checkout", {
         ...data,
         zip_code: data.zipCode,
       });
-      console.log("Order response:", resp);
       toast.success(resp.data.message || "Order placed successfully!");
       clearCart();
       navigate(paths.products);

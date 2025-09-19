@@ -84,7 +84,6 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
           size: selectedSize,
           quantity: quantityToAdd,
         });
-        console.log(response);
         toast.success("Added to cart");
         setCartItems((prev) => {
           const idx = prev.findIndex(
