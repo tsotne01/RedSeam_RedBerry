@@ -10,6 +10,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { client } from "../../../shared/api";
 import { useAuth } from "../../../shared/hooks/use-auth";
 
+import EmailIcon from "../../../assets/icons/email_icon.svg"
+
 const checkoutSchema = z.object({
   name: z
     .string()
@@ -151,6 +153,7 @@ export const CheckoutPage = () => {
                 type="email"
                 placeholder="Email"
                 error={errors.email?.message || ""}
+                icon={<img src={EmailIcon} alt="email"/>}
                 {...register("email")}
               />
             </div>
