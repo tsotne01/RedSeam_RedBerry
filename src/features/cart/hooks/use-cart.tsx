@@ -48,11 +48,6 @@ interface ICartContext {
     options: { color: string; size: string },
     step?: number
   ) => void;
-  setCartItemQuantity: (
-    productId: string,
-    options: { color: string; size: string },
-    quantity: number
-  ) => void;
   clearCart: () => void;
 }
 
@@ -128,101 +123,99 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       options: { color: string; size: string },
       step: number = 1
     ) => {
-      try {
-        setCartItems((prev) =>
-          prev.map((it) => {
-            if (
-              it.id === productId &&
-              it.selectedColor === options.color &&
-              it.selectedSize === options.size
-            ) {
-              (async () => {
-                await client.patch(`/cart/products/${productId}`, {
-                  quantity: it.quantity + Math.max(1, step),
-                });
-              })();
-            }
-            return it.id === productId &&
-              it.selectedColor === options.color &&
-              it.selectedSize === options.size
-              ? { ...it, quantity: it.quantity + Math.max(1, step) }
-              : it;
-          })
-        );
-      } catch (error) {
-        if (error instanceof ZodError) {
-          toast.error(
-            "Failed to increment cart item quantity: " + error.message
-          );
-          return;
-        }
-        toast.error("Failed to increment cart item quantity");
+      const foundItem = cartItems.find(
+        (item) =>
+          item.id === productId &&
+          item.selectedColor === options.color &&
+          item.selectedSize === options.size
+      );
+      if (!foundItem) return;
+      const newQty = Math.max(1, foundItem.quantity + Math.max(1, step));
+      const resp = await client.patch(`/cart/products/${productId}`, {
+        quantity: newQty,
+      });
+
+      if (resp.status !== 200) {
+        toast.error("Failed To Increment Item Quantity");
+        return;
       }
+      setCartItems((prev) =>
+        prev.map((item) => {
+          if (
+            item.id === productId &&
+            item.selectedColor === options.color &&
+            item.selectedSize === options.size
+          ) {
+            const newQty = item.quantity + Math.max(1, step);
+            return { ...item, quantity: newQty };
+          }
+          return item;
+        })
+      );
+      toast.success("Item Quantity Incremented!");
     },
-    [setCartItems]
+    [setCartItems, cartItems]
   );
 
   const decrementCartItemQuantity = useCallback(
-    (
+    async (
       productId: string,
       options: { color: string; size: string },
       step: number = 1
     ) => {
-      setCartItems((prev) =>
-        prev.map((it) =>
-          it.id === productId &&
-          it.selectedColor === options.color &&
-          it.selectedSize === options.size
-            ? { ...it, quantity: Math.max(1, it.quantity - Math.max(1, step)) }
-            : it
-        )
+      const foundItem = cartItems.find(
+        (item) =>
+          item.id === productId &&
+          item.selectedColor === options.color &&
+          item.selectedSize === options.size
       );
-    },
-    [setCartItems]
-  );
+      console.log("Found Item:", foundItem);
+      if (!foundItem) return;
+      const newQty = Math.max(1, foundItem.quantity - Math.max(1, step));
 
-  const setCartItemQuantity = useCallback(
-    (
-      productId: string,
-      options: { color: string; size: string },
-      quantity: number
-    ) => {
-      const safeQty = Math.max(1, quantity);
+      const resp = await await client.patch(`/cart/products/${productId}`, {
+        quantity: newQty,
+      });
+
+      if (resp.status !== 200) {
+        toast.error("Failed To Decrement Item Quantity");
+        return;
+      }
       setCartItems((prev) =>
-        prev.map((it) =>
-          it.id === productId &&
-          it.selectedColor === options.color &&
-          it.selectedSize === options.size
-            ? { ...it, quantity: safeQty }
-            : it
-        )
+        prev.map((item) => {
+          if (
+            item.id === productId &&
+            item.selectedColor === options.color &&
+            item.selectedSize === options.size
+          ) {
+            const newQty = item.quantity - Math.max(1, step);
+            return { ...item, quantity: newQty };
+          }
+          return item;
+        })
       );
+      toast.success("Item Quantity Decremented!");
     },
-    [setCartItems]
+    [setCartItems, cartItems]
   );
 
   const removeFromCart = useCallback(
-    (productId: string, options?: { color?: string; size?: string }) => {
-      try {
-        (async () => {
-          await client.delete(`/cart/products/${productId}`);
-        })();
-        setCartItems((prev) =>
-          prev.filter((it) => {
-            if (it.id !== productId) return true;
-            if (options?.color && it.selectedColor !== options.color)
-              return true;
-            if (options?.size && it.selectedSize !== options.size) return true;
-            return false;
-          })
-        );
-      } catch (error) {
-        if (error instanceof ZodError) {
-          toast.error("Failed to remove from cart: " + error.message);
-          return;
-        }
-        toast.error("Failed to remove from cart");
+    async (productId: string, options?: { color?: string; size?: string }) => {
+      const resp = await client.delete(`/cart/products/${productId}`);
+      console.log(resp);
+      if (resp.status !== 204 || !resp) {
+        toast.error("Failed To remove Item");
+        return;
       }
+      setCartItems((prev) =>
+        prev.filter((it) => {
+          if (it.id !== productId) return true;
+          if (options?.color && it.selectedColor !== options.color) return true;
+          if (options?.size && it.selectedSize !== options.size) return true;
+          return false;
+        })
+      );
+      toast.success("Removed Item From Cart!");
     },
     [setCartItems]
   );
@@ -250,7 +243,6 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       removeFromCart,
       incrementCartItemQuantity,
       decrementCartItemQuantity,
-      setCartItemQuantity,
       clearCart,
     }),
     [
@@ -261,7 +253,6 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       removeFromCart,
       incrementCartItemQuantity,
       decrementCartItemQuantity,
-      setCartItemQuantity,
       clearCart,
     ]
   );
