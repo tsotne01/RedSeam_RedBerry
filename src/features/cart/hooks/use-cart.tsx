@@ -79,7 +79,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         payload;
       const quantityToAdd = Math.max(1, payload?.quantity ?? 1);
       try {
-        const response = await client.post(`/cart/products/${id}`, {
+        await client.post(`/cart/products/${id}`, {
           color: selectedColor,
           size: selectedSize,
           quantity: quantityToAdd,
