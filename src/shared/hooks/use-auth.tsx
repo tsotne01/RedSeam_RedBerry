@@ -10,6 +10,7 @@ import {
 } from "react";
 import type { IUser } from "../models";
 import { client } from "../api";
+import { useLocallyStoredState } from "./use-locally-stored-state";
 
 interface ILoginResponse {
   token: string;
@@ -34,7 +35,7 @@ interface IAuthContext {
 const AuthContext = createContext<IAuthContext | null>(null);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<IUser | null>(null);
+  const [user, setUser] = useLocallyStoredState<IUser | null>("user",null);
   const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
@@ -55,7 +56,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     console.log("User Fom api.",user);
     setUser({
       id: user.id,
-      name: user.name,
       email: user.email,
       profile_photo: user.avatar,
     });
