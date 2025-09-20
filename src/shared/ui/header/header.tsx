@@ -1,8 +1,8 @@
 import { NavLink, Outlet } from "react-router";
 import logo from "../../../assets/logo/redseam_logo.svg";
 import userIcon from "../../../assets/icons/user_icon.png";
-import fallbackAvatar from "../../../assets/auth/fallback_avatar.png"
-import cartIconDark from "../../../assets/icons/cart_icon_dark.svg"
+import fallbackAvatar from "../../../assets/auth/fallback_avatar.png";
+import cartIconDark from "../../../assets/icons/cart_icon_dark.svg";
 // cart UI moved to widget
 import { useAuth } from "../../hooks/use-auth";
 import { useState } from "react";
@@ -11,7 +11,8 @@ import { useCart } from "../../../features/cart/hooks/use-cart";
 export const Header = () => {
   const { isAuthenticated, user } = useAuth();
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const { totalQuantity } = useCart()
+  const { totalQuantity } = useCart();
+  console.log(user);
   return (
     <div className="h-screen">
       <header className="flex items-center justify-between px-[100px] h-20">
@@ -33,15 +34,21 @@ export const Header = () => {
           ) : (
             <div className="flex gap-5">
               <button
-                onClick={() => setIsCartOpen(prev => !prev)}
+                onClick={() => setIsCartOpen((prev) => !prev)}
                 className="cursor-pointer relative"
               >
                 <img src={cartIconDark} alt="cart" />
                 {totalQuantity > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-[#FF4000] text-white text-[10px] leading-none rounded-full px-1.5 py-1">{totalQuantity}</span>
+                  <span className="absolute -top-2 -right-2 bg-[#FF4000] text-white text-[10px] leading-none rounded-full px-1.5 py-1">
+                    {totalQuantity}
+                  </span>
                 )}
               </button>
-              <img src={user?.profile_photo || fallbackAvatar} alt="profile" className="w-[38px] h-[38px] rounded-full" />
+              <img
+                src={user?.profile_photo || fallbackAvatar}
+                alt="profile"
+                className="w-[38px] h-[38px] rounded-full"
+              />
             </div>
           )}
         </div>
