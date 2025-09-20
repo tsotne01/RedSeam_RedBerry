@@ -52,11 +52,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
     const data = res.data;
     const user = data.user;
+    console.log("User Fom api.",user);
     setUser({
       id: user.id,
       name: user.name,
       email: user.email,
-      profile_photo: user.profile_photo,
+      profile_photo: user.avatar,
     });
     setToken(data.token);
     localStorage.setItem("auth_token", data.token);
