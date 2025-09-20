@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { client } from "../../../shared/api";
+import { useAuth } from "../../../shared/hooks/use-auth";
 
 const checkoutSchema = z.object({
   name: z
@@ -46,6 +47,8 @@ const checkoutSchema = z.object({
 type CheckoutFormData = z.infer<typeof checkoutSchema>;
 
 export const CheckoutPage = () => {
+  const { user } = useAuth();
+
   const {
     register,
     handleSubmit,
@@ -56,7 +59,7 @@ export const CheckoutPage = () => {
     defaultValues: {
       name: "",
       surname: "",
-      email: "",
+      email: user?.email,
       address: "",
       zipCode: "",
     },

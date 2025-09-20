@@ -35,7 +35,7 @@ interface IAuthContext {
 const AuthContext = createContext<IAuthContext | null>(null);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useLocallyStoredState<IUser | null>("user",null);
+  const [user, setUser] = useLocallyStoredState<IUser | null>("user", null);
   const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
@@ -53,7 +53,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
     const data = res.data;
     const user = data.user;
-    console.log("User Fom api.",user);
+    
     setUser({
       id: user.id,
       email: user.email,
