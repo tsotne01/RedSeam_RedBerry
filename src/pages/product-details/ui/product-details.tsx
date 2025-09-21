@@ -89,6 +89,13 @@ export const ProductDetails = ({ product, currentImageIndex, onPhotoChange }: IP
         disabled={!selectedColor || !selectedSize}
         onClick={handleAddToCart}
       />
+      <hr className="my-14 border-gray-300" />
+      <div className="flex items-center justify-between mb-6">
+        <span className="font-poppins block font-normal text-[#10151F] text-lg">Details</span>
+        <img src={product?.brand?.image} alt={product?.brand?.name || "brand"} width={38} height={38} />
+      </div>
+      <span className="text-[#3E424A] mb-5 block">Brand: {product?.brand?.name || "No brand"}</span>
+      <p className="text-[#3E424A]">{product.description || "No description"}</p>
     </div>
   );
 };

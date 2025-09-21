@@ -26,7 +26,7 @@ export const ProductImages = ({ product, onPhotoChange, imageIndex }: IProductIm
             <div>
                 {product.images && (
                     <img
-                        className="w-[492px] h-[656px] object-cover rounded"
+                        className="w-[703px] h-[937px] object-cover rounded"
                         src={product.images[imageIndex]}
                         alt={product.name}
                         loading='lazy'
