@@ -24,11 +24,11 @@ export const ProductFilter = ({
 }: IProductFilterProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [isOpen, setIsOpen] = useState(false);
-  
+
   const sortOption = (searchParams.get("sort") as TSortingOptions) || undefined;
   const priceFrom = searchParams.get("price_from") || "";
   const priceTo = searchParams.get("price_to") || "";
-  
+
   const [localPriceFrom, setLocalPriceFrom] = useState<string>(priceFrom);
   const [localPriceTo, setLocalPriceTo] = useState<string>(priceTo);
 
@@ -66,9 +66,7 @@ export const ProductFilter = ({
         newParams[key] = paramValue;
       }
     });
-    if (value !== "created_at") {
-      newParams.sort = value;
-    }
+    newParams.sort = value;
     setSearchParams(newParams);
   }, [searchParams, setSearchParams]);
 
@@ -81,7 +79,7 @@ export const ProductFilter = ({
     <div className="flex gap-2 items-center">
       <span className="text-sm text-[#3E424A]">{resultsText}</span>
       <div className="bg-[#E1DFE1] mx-3 min-h-[20px] w-[1px]" />
- 
+
       <div className="relative">
         <button className="cursor-pointer flex gap-4 font-poppins text-base text-[#10151F]" onClick={handleFilterToggle}>
           <img src={filterIcon} alt="filter" />
@@ -124,15 +122,16 @@ export const ProductFilter = ({
           </div>
         )}
       </div>
- 
+
       <div>
         <select
           title="sort"
           name="sort"
           className="h-10 w-30 rounded-[8px] border border-[#E1DFE1] px-3 bg-white"
-          value={sortOption || "created_at"}
+          value={sortOption || ""}
           onChange={(e) => handleSortChange(e.target.value)}
         >
+          <option value="" disabled>Sort By</option>
           <option value="created_at">New products first</option>
           <option value="price">Price, low to high</option>
           <option value="-price">Price, high to low</option>
