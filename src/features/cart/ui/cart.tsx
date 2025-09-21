@@ -1,10 +1,11 @@
 import noItemsImage from "../../../assets/no_items_in_cart.png";
 import { Button, CartItem, OrderSummary } from "../../../shared/ui";
 import { useNavigate } from "react-router";
-import { useCart, type ICartItem } from "../hooks/use-cart";
+import { useCart } from "../hooks/use-cart";
 
 import closeIcon from "../../../assets/icons/close_icon.png"
 import { paths } from "../../../shared/constants";
+import type { ICartItem } from "../model/model";
 
 
 export const CartWidget = ({ onClose }: { onClose: () => void }) => {
