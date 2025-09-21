@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
-import { client } from "../../../shared/api";
+import { useState } from "react";
 import { ProductCard } from "../../../shared/ui/product-card/product-card";
 import type { IProduct } from "../../../shared/models";
 import { ProductFilter, type TSortingOptions, type IFilterOptions } from "../../../features/product-filter";
 import { Pagination } from "../../../features/pagination";
+import { useLoaderData } from "react-router";
 
 interface IProductsMetadata {
   current_page: number;
@@ -15,28 +15,11 @@ interface IProductsMetadata {
 }
 
 export const ProductsPage = () => {
-  const [products, setProducts] = useState<IProduct[] | null>(null);
-  const [productsMetaData, setProductsMetaData] = useState<IProductsMetadata>();
+
+  const { products, productsMetaData } = useLoaderData() as { products: IProduct[], productsMetaData: IProductsMetadata };
   const [page, setPage] = useState(1);
   const [filterOptions, setFilterOptions] = useState<IFilterOptions>();
   const [sortOption, setSortOption] = useState<TSortingOptions>();
-
-  useEffect(() => {
-    (async () => {
-      const response = await client.get("/products", {
-        params: {
-          page: page,
-          sort: sortOption ? sortOption : undefined,
-          filter: {
-            price_from: filterOptions?.price_from,
-            price_to: filterOptions?.price_to,
-          },
-        },
-      });
-      setProductsMetaData(response.data.meta)
-      setProducts(response.data.data);
-    })();
-  }, [filterOptions, page, sortOption]);
 
   return (
     <>
@@ -60,14 +43,14 @@ export const ProductsPage = () => {
       </div>
       <div className="flex flex-wrap gap-[24px] mt-10">
         {products &&
-          products.map((product: IProduct) => (
+          products?.map((product: IProduct) => (
             <ProductCard key={product.id} {...product} />
           ))}
       </div>
       {productsMetaData && (
         <Pagination
           currentPage={page}
-          totalPages={productsMetaData.last_page}
+          totalPages={productsMetaData?.last_page}
           onPageChange={setPage}
         />
       )}

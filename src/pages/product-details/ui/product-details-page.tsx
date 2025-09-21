@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router";
+import { useNavigate, useLoaderData } from "react-router";
 import type { IProduct } from "../../../shared/models";
-import { client } from "../../../shared/api";
 import { Button } from "../../../shared/ui";
 import toast from "react-hot-toast";
 
@@ -12,33 +11,18 @@ import { useCart } from "../../../features/cart/hooks/use-cart";
 import { ProductImages } from "../../../widgets/product-images";
 
 export const ProductDetailsPage = () => {
-  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
-  const [product, setProduct] = useState<IProduct | null>(null);
+  const { product } = useLoaderData<{ product: IProduct }>();
+  // const [product, setProduct] = useState<IProduct | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [currentColor, setCurrentColor] = useState<string | null>(null);
   const [currentSize, setCurrentSize] = useState<string | null>(null);
   const [quantity, setQuantity] = useState<number>(1);
-  const [isPending, setIsPending] = useState<boolean>(false);
   const { addToCart } = useCart()
+
   useEffect(() => {
-    (async () => {
-      if (id) {
-        try {
-          setIsPending(true);
-          const response = await client(`/products/${id}`);
-          setProduct(response.data);
-        } catch (error) {
-          console.log(error);
-        } finally {
-          setIsPending(false);
-        }
-      }
-    })();
-  }, [id]);
-  // Initialize default selections when product loads
-  useEffect(() => {
+    console.log(product);
     if (!product) return;
     if (!currentColor && product.available_colors && product.available_colors.length > 0) {
       setCurrentColor(product.available_colors[0]);
@@ -49,7 +33,7 @@ export const ProductDetailsPage = () => {
       setCurrentSize(defaultSizes[0]);
     }
   }, [product, currentColor, currentSize]);
-  if (!product && isPending) {
+  if (!product) {
     return <div>...loading</div>
   }
   if (!product) {
@@ -166,9 +150,9 @@ export const ProductDetailsPage = () => {
         <hr className="my-14 border-gray-300" />
         <div className="flex items-center justify-between mb-6">
           <span className="font-poppins block font-normal text-[#10151F] text-lg">Details</span>
-          <img src={product.brand.image} alt={product.brand.name} width={38} height={38} />
+          <img src={product?.brand?.image} alt={product?.brand?.name || "brand"} width={38} height={38} />
         </div>
-        <span className="text-[#3E424A] mb-5 block">Brand: {product.brand.name}</span>
+        <span className="text-[#3E424A] mb-5 block">Brand: {product?.brand?.name || "No brand"}</span>
         <p className="text-[#3E424A]">{product.description || "No description"}</p>
       </div>
     </div>
