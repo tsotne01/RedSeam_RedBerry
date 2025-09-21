@@ -14,7 +14,6 @@ export const ProductDetailsPage = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { product } = useLoaderData<{ product: IProduct }>();
-  // const [product, setProduct] = useState<IProduct | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [currentColor, setCurrentColor] = useState<string | null>(null);
   const [currentSize, setCurrentSize] = useState<string | null>(null);
@@ -22,7 +21,6 @@ export const ProductDetailsPage = () => {
   const { addToCart } = useCart()
 
   useEffect(() => {
-    console.log(product);
     if (!product) return;
     if (!currentColor && product.available_colors && product.available_colors.length > 0) {
       setCurrentColor(product.available_colors[0]);

@@ -12,7 +12,6 @@ export const Header = () => {
   const { isAuthenticated, user } = useAuth();
   const [isCartOpen, setIsCartOpen] = useState(false);
   const { totalQuantity } = useCart();
-  console.log(user);
   return (
     <div className="h-screen">
       <header className="flex items-center justify-between px-[100px] h-20">

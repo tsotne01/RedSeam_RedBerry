@@ -8,48 +8,11 @@ import {
 } from "react";
 import { toast } from "react-hot-toast";
 import { useLocallyStoredState } from "../../../shared/hooks/use-locally-stored-state";
-import { client } from "../../../shared/api";
 import { ZodError } from "zod";
+import type { ICartContext, ICartItem } from "../model/model";
+import { addItemToServer, deleteItemFromServer, updateItemOnServer } from "../api/api";
 
-export interface ICartItem {
-  id: string;
-  name: string;
-  price: number;
-  quantity: number;
-  selectedColor: string;
-  selectedSize: string;
-  selectedImage: string;
-}
 
-interface ICartContext {
-  cartItems: ICartItem[];
-  totalQuantity: number;
-  subtotalPrice: number;
-  addToCart: (payload: {
-    id: string;
-    name: string;
-    price: number;
-    selectedColor: string;
-    selectedSize: string;
-    selectedImage: string;
-    quantity?: number;
-  }) => void;
-  removeFromCart: (
-    productId: string,
-    options?: { color?: string; size?: string }
-  ) => void;
-  incrementCartItemQuantity: (
-    productId: string,
-    options: { color: string; size: string },
-    step?: number
-  ) => void;
-  decrementCartItemQuantity: (
-    productId: string,
-    options: { color: string; size: string },
-    step?: number
-  ) => void;
-  clearCart: () => void;
-}
 
 const CartContext = createContext<ICartContext | null>(null);
 
@@ -74,9 +37,13 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         payload;
       const quantityToAdd = Math.max(1, payload?.quantity ?? 1);
       try {
-        await client.post(`/cart/products/${id}`, {
-          color: selectedColor,
-          size: selectedSize,
+        await addItemToServer({
+          id,
+          name,
+          price,
+          selectedColor,
+          selectedSize,
+          selectedImage,
           quantity: quantityToAdd,
         });
         toast.success("Added to cart");
@@ -131,7 +98,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       );
       if (!foundItem) return;
       const newQty = Math.max(1, foundItem.quantity + Math.max(1, step));
-      const resp = await client.patch(`/cart/products/${productId}`, {
+      const resp = await updateItemOnServer(foundItem.id, {
         quantity: newQty,
       });
 
@@ -169,11 +136,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
           item.selectedColor === options.color &&
           item.selectedSize === options.size
       );
-      console.log("Found Item:", foundItem);
       if (!foundItem) return;
       const newQty = Math.max(1, foundItem.quantity - Math.max(1, step));
 
-      const resp = await await client.patch(`/cart/products/${productId}`, {
+      const resp = await updateItemOnServer(foundItem.id, {
         quantity: newQty,
       });
 
@@ -201,8 +167,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const removeFromCart = useCallback(
     async (productId: string, options?: { color?: string; size?: string }) => {
-      const resp = await client.delete(`/cart/products/${productId}`);
-      console.log(resp);
+      const resp = await deleteItemFromServer(productId);
       if (resp.status !== 204 || !resp) {
         toast.error("Failed To remove Item");
         return;
