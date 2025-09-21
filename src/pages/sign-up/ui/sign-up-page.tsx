@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { AuthLayout, Button } from "../../../shared/ui";
+import { AuthLayout, Button, Input } from "../../../shared/ui";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
@@ -31,6 +31,7 @@ export const SignUpPage = () => {
     register,
     handleSubmit,
     formState: { errors },
+    setError,
   } = useForm<SignUpForm>({
     resolver: zodResolver(signUpSchema),
   });
@@ -46,16 +47,24 @@ export const SignUpPage = () => {
       });
     } catch (error) {
       console.error("Registration failed:", error);
+      setError("root", { message: "Something went wrong" });
     }
   };
   return (
     <AuthLayout>
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
         <div className="flex items-center gap-6">
-          <label htmlFor="profile-pic" className="text-sm font-medium flex items-center gap-4">
+          <label
+            htmlFor="profile-pic"
+            className="text-sm font-medium flex items-center gap-4"
+          >
             <img
               className="w-[80px] h-[80px] rounded-full"
-              src={avatarPreview ? URL.createObjectURL(avatarPreview) : defaultAvatar}
+              src={
+                avatarPreview
+                  ? URL.createObjectURL(avatarPreview)
+                  : defaultAvatar
+              }
               alt="avatar"
             />
             <input
@@ -71,60 +80,61 @@ export const SignUpPage = () => {
               }}
             />
             <span className="inline-block"> Upload new</span>
+            {errors.avatar?.message && (
+              <p className="text-red-600">{errors.avatar.message}</p>
+            )}
           </label>
           <button type="button" onClick={() => setAvatarPreview(null)}>
             Remove
           </button>
         </div>
-        <label htmlFor="username">
-          <input
-            type="text"
-            className="w-[554px] h-[42px] rounded-[8px] border border-[#E1DFE1] px-3 bg-white"
-            placeholder="username"
-            {...register("username")}
-          />
-        </label>
-        <label className="block mb-2 text-sm font-medium text-gray-900 ">
-          <input
-            type="email"
-            className="w-[554px] h-[42px] rounded-[8px] border border-[#E1DFE1] px-3 bg-white"
-            placeholder="email"
-            {...register("email")}
-          />
-          {errors.email && (
-            <p className="text-red-500">{errors?.email?.message}</p>
-          )}
-        </label>
-        <label className="block mb-2 text-sm font-medium text-gray-900 ">
-          <input
-            type="password"
-            className="w-[554px] h-[42px] rounded-[8px] border border-[#E1DFE1] px-3 bg-white"
-            placeholder="password"
-            {...register("password")}
-          />
-          {errors.password && (
-            <p className="text-red-500">{errors?.password?.message}</p>
-          )}
-        </label>
-        <label className="block mb-2 text-sm font-medium text-gray-900 ">
-          <input
-            type="password"
-            className="w-[554px] h-[42px] rounded-[8px] border border-[#E1DFE1] px-3 bg-white"
-            placeholder="confirm password"
-            {...register("confirmPassword")}
-          />
-          {errors.confirmPassword && (
-            <p className="text-red-500">{errors?.confirmPassword?.message}</p>
-          )}
-        </label>
+        <Input
+          label="username"
+          type="text"
+          className="w-[554px] h-[42px]"
+          placeholder="username"
+          {...register("username")}
+          error={errors.username?.message}
+        />
+        <Input
+          label="email"
+          type="email"
+          className="w-[554px] h-[42px] "
+          placeholder="email"
+          {...register("email")}
+        />
+
+        <Input
+          label="password"
+          type="password"
+          className="w-[554px] h-[42px]"
+          placeholder="password"
+          {...register("password")}
+          error={errors.password?.message}
+        />
+
+        <Input
+          label="confirm password"
+          type="password"
+          className="w-[554px] h-[42px]"
+          placeholder="confirm password"
+          {...register("confirmPassword")}
+          error={errors.confirmPassword?.message}
+        />
+
         <Button type="submit" size="large" className="mb-12 w-full">
           Sign Up
         </Button>
+        {errors.root?.message && (
+          <p className="text-red-500 text-sm">{errors.root.message}</p>
+        )}
         <div className="w-full text-center text-sm">
           <span className="text-[#10151F]">Already member? </span>
-          <Link to={paths.signIn} className="text-[#FF4000]">Login</Link>
+          <Link to={paths.signIn} className="text-[#FF4000]">
+            Login
+          </Link>
         </div>
       </form>
-    </AuthLayout >
+    </AuthLayout>
   );
 };

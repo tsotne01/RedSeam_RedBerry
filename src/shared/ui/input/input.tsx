@@ -1,4 +1,8 @@
-import React, { type ReactNode } from "react";
+
+import React, { useState, type ReactNode } from "react";
+
+import PasswordVisible from "../../../assets/icons/password_visible.svg";
+import PasswordInvisible from "../../../assets/icons/password_invisible.svg";
 
 interface IInput extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
@@ -14,16 +18,24 @@ export const Input = React.forwardRef<HTMLInputElement, IInput>(
     { label, name, type, placeholder, error, className, icon, ...rest },
     ref
   ) => {
+    const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     return (
       <div className={`${className} relative`}>
         <label className="hidden" htmlFor={name}>
           {label}
         </label>
         {icon && (
+          <div className="absolute top-1/2 left-2 -translate-y-1/2">{icon}</div>
+        )}
+        {type == "password" && (
           <div
-            className="absolute top-1/2 left-2 -translate-y-1/2"
+            onClick={() => setIsPasswordVisible((prev) => !prev)}
+            className="absolute top-1/2 -translate-y-1/2 right-2"
           >
-            {icon}
+            <img
+              src={isPasswordVisible ? PasswordVisible : PasswordInvisible}
+              alt="visibility"
+            />
           </div>
         )}
         <input
@@ -31,7 +43,7 @@ export const Input = React.forwardRef<HTMLInputElement, IInput>(
           className={`${
             icon && "pl-8"
           } h-full w-full rounded-[8px] px-3 py-2.5 bg-white border-1 border-[#E1DFE1]`}
-          type={type}
+          type={isPasswordVisible ? "text" : type}
           id={name}
           name={name}
           placeholder={placeholder}
