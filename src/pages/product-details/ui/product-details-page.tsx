@@ -9,6 +9,7 @@ import { useAuth } from "../../../shared/hooks/use-auth";
 import { paths } from "../../../shared/constants";
 import { useCart } from "../../../features/cart/hooks/use-cart";
 import { ProductImages } from "../../../widgets/product-images";
+import { colorMap } from "../../../shared/constants/colors/colors";
 
 export const ProductDetailsPage = () => {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ export const ProductDetailsPage = () => {
   const [currentSize, setCurrentSize] = useState<string | null>(null);
   const [quantity, setQuantity] = useState<number>(1);
   const { addToCart } = useCart()
+  console.log(colorMap);
 
   useEffect(() => {
     if (!product) return;
@@ -93,7 +95,7 @@ export const ProductDetailsPage = () => {
                     ? "ring-2 ring-offset-4 ring-[#E1DFE1]"
                     : ""
                     }`}
-                  style={{ backgroundColor: color }}
+                  style={{ backgroundColor: colorMap[color] }}
                   onClick={() => {
                     setCurrentColor(color)
                     setCurrentImageIndex(index)

@@ -6,9 +6,15 @@ export const deleteItemFromServer = async (id: string) => {
 }
 
 export const updateItemOnServer = async (id: string, data: Partial<ICartItem>) => {
-    return await client.put(`/cart/products/${id}`, data);
+    return await client.patch(`/cart/products/${id}`, data);
 }
 
 export const addItemToServer = async (data: ICartItem) => {
-    return await client.post(`/cart/products`, data);
+    const { id, ...restData } = data;
+    return await client.post(`/cart/products/${id}`, {
+        ...restData,
+        color: restData.selectedColor,
+        size: restData.selectedSize,
+        image: restData.selectedImage,
+    });
 }
