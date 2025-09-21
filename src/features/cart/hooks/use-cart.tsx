@@ -124,47 +124,6 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     [setCartItems, cartItems]
   );
 
-  const decrementCartItemQuantity = useCallback(
-    async (
-      productId: string,
-      options: { color: string; size: string },
-      step: number = 1
-    ) => {
-      const foundItem = cartItems.find(
-        (item) =>
-          item.id === productId &&
-          item.selectedColor === options.color &&
-          item.selectedSize === options.size
-      );
-      if (!foundItem) return;
-      const newQty = Math.max(1, foundItem.quantity - Math.max(1, step));
-
-      const resp = await updateItemOnServer(foundItem.id, {
-        quantity: newQty,
-      });
-
-      if (resp.status !== 200) {
-        toast.error("Failed To Decrement Item Quantity");
-        return;
-      }
-      setCartItems((prev) =>
-        prev.map((item) => {
-          if (
-            item.id === productId &&
-            item.selectedColor === options.color &&
-            item.selectedSize === options.size
-          ) {
-            const newQty = item.quantity - Math.max(1, step);
-            return { ...item, quantity: newQty };
-          }
-          return item;
-        })
-      );
-      toast.success("Item Quantity Decremented!");
-    },
-    [setCartItems, cartItems]
-  );
-
   const removeFromCart = useCallback(
     async (productId: string, options?: { color?: string; size?: string }) => {
       const resp = await deleteItemFromServer(productId);
@@ -183,6 +142,52 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       toast.success("Removed Item From Cart!");
     },
     [setCartItems]
+  );
+
+  const decrementCartItemQuantity = useCallback(
+    async (
+      productId: string,
+      options: { color: string; size: string },
+      step: number = 1
+    ) => {
+      const foundItem = cartItems.find(
+        (item) =>
+          item.id === productId &&
+          item.selectedColor === options.color &&
+          item.selectedSize === options.size
+      );
+      if (!foundItem) return;
+      
+      if (foundItem.quantity <= 1) {
+        await removeFromCart(productId, options);
+        return;
+      }
+
+      const newQty = foundItem.quantity - Math.max(1, step);
+
+      const resp = await updateItemOnServer(foundItem.id, {
+        quantity: newQty,
+      });
+
+      if (resp.status !== 200) {
+        toast.error("Failed To Decrement Item Quantity");
+        return;
+      }
+      setCartItems((prev) =>
+        prev.map((item) => {
+          if (
+            item.id === productId &&
+            item.selectedColor === options.color &&
+            item.selectedSize === options.size
+          ) {
+            return { ...item, quantity: newQty };
+          }
+          return item;
+        })
+      );
+      toast.success("Item Quantity Decremented!");
+    },
+    [setCartItems, cartItems, removeFromCart]
   );
 
   const clearCart = useCallback(() => {
