@@ -1,19 +1,36 @@
 import arrowLeft from "../../../assets/icons/arrow_left.svg";
 import arrowRight from "../../../assets/icons/arrow_right.svg";
+import { useSearchParams } from "react-router";
 
 interface IPaginationProps {
-  currentPage: number;
   totalPages: number;
-  onPageChange: (page: number) => void;
 }
 
-export const Pagination = ({ currentPage, totalPages, onPageChange }: IPaginationProps) => {
+export const Pagination = ({ totalPages }: IPaginationProps) => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const currentPage = Number(searchParams.get("page")) || 1;
+
+  const handlePageChange = (page: number) => {
+    // Use the shorthand object format for setSearchParams
+    const newParams: { [key: string]: string } = {};
+    
+    // Copy existing params
+    searchParams.forEach((value, key) => {
+      newParams[key] = value;
+    });
+    
+    // Set the new page
+    newParams.page = page.toString();
+    
+    setSearchParams(newParams);
+  };
+
   const handlePrevious = () => {
-    onPageChange(Math.max(currentPage - 1, 1));
+    handlePageChange(Math.max(currentPage - 1, 1));
   };
 
   const handleNext = () => {
-    onPageChange(Math.min(currentPage + 1, totalPages));
+    handlePageChange(Math.min(currentPage + 1, totalPages));
   };
 
   const generatePageNumbers = () => {
@@ -57,7 +74,7 @@ export const Pagination = ({ currentPage, totalPages, onPageChange }: IPaginatio
             className={`px-4 py-2 ${
               item === currentPage ? "border-1 border-[#FF4000] rounded-[4px]" : ""
             }`}
-            onClick={() => onPageChange(item)}
+            onClick={() => handlePageChange(item)}
           >
             {item}
           </button>

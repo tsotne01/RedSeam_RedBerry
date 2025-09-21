@@ -18,6 +18,7 @@ export const ProductImages = ({ product, onPhotoChange, imageIndex }: IProductIm
                                 key={img}
                                 src={img}
                                 alt={product.name}
+                                loading='lazy'
                             />
                         </button>
                     ))}
@@ -28,6 +29,7 @@ export const ProductImages = ({ product, onPhotoChange, imageIndex }: IProductIm
                         className="w-[492px] h-[656px] object-cover rounded"
                         src={product.images[imageIndex]}
                         alt={product.name}
+                        loading='lazy'
                     />
                 )}
             </div>

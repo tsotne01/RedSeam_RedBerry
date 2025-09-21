@@ -34,6 +34,7 @@ export const CartItem = ({
           className="w-[100px] height-[134px] rounded-[10px] border-1 border-[#E1DFE1]"
           src={selectedImage}
           alt={name}
+          loading="lazy"
         />
       </div>
       <div className="flex flex-col flex-1">

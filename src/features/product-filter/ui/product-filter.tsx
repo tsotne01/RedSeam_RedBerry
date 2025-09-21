@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
+import { useSearchParams } from "react-router";
 import { Button } from "../../../shared/ui";
 
 import filterIcon from "../../../assets/icons/filter_icon.svg"
@@ -11,11 +12,6 @@ export interface IFilterOptions {
 }
 
 interface IProductFilterProps {
-  filterOptions?: IFilterOptions;
-  sortOption?: TSortingOptions;
-  onFilterChange: (filters: IFilterOptions | undefined) => void;
-  onSortChange: (sort: TSortingOptions | undefined) => void;
-  onPageReset: () => void;
   resultsCount?: {
     from: number;
     to: number;
@@ -24,50 +20,57 @@ interface IProductFilterProps {
 }
 
 export const ProductFilter = ({
-  sortOption,
-  onFilterChange,
-  onSortChange,
-  onPageReset,
   resultsCount,
 }: IProductFilterProps) => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [isOpen, setIsOpen] = useState(false);
-  const [priceFrom, setPriceFrom] = useState<string>("");
-  const [priceTo, setPriceTo] = useState<string>("");
+  
+  const sortOption = (searchParams.get("sort") as TSortingOptions) || undefined;
+  const priceFrom = searchParams.get("price_from") || "";
+  const priceTo = searchParams.get("price_to") || "";
+  
+  const [localPriceFrom, setLocalPriceFrom] = useState<string>(priceFrom);
+  const [localPriceTo, setLocalPriceTo] = useState<string>(priceTo);
 
-  // Memoized handlers to prevent unnecessary re-renders
   const handleFilterToggle = useCallback(() => {
     setIsOpen(prev => !prev);
   }, []);
 
   const handleApplyFilters = useCallback(() => {
-    const priceFromNum = priceFrom === "" ? undefined : Number(priceFrom);
-    const priceToNum = priceTo === "" ? undefined : Number(priceTo);
+    const priceFromNum = localPriceFrom === "" ? undefined : Number(localPriceFrom);
+    const priceToNum = localPriceTo === "" ? undefined : Number(localPriceTo);
 
-    // Prevent setting only one filter - both from and to must be provided or both empty
     if ((priceFromNum !== undefined && priceToNum === undefined) ||
       (priceFromNum === undefined && priceToNum !== undefined)) {
       return;
     }
 
+    const newParams: { [key: string]: string } = {};
+    searchParams.forEach((value, key) => {
+      if (key !== 'price_from' && key !== 'price_to' && key !== 'page') {
+        newParams[key] = value;
+      }
+    });
     if (priceFromNum !== undefined && priceToNum !== undefined) {
-      const newFilters: IFilterOptions = {
-        price_from: priceFromNum,
-        price_to: priceToNum,
-      };
-      onFilterChange(newFilters);
-    } else {
-      onFilterChange(undefined);
+      newParams.price_from = priceFromNum.toString();
+      newParams.price_to = priceToNum.toString();
     }
-
+    setSearchParams(newParams);
     setIsOpen(false);
-    onPageReset();
-  }, [priceFrom, priceTo, onFilterChange, onPageReset]);
+  }, [localPriceFrom, localPriceTo, searchParams, setSearchParams]);
 
   const handleSortChange = useCallback((value: string) => {
-    const sortValue = value as TSortingOptions;
-    onSortChange(sortValue);
-    onPageReset();
-  }, [onSortChange, onPageReset]);
+    const newParams: { [key: string]: string } = {};
+    searchParams.forEach((paramValue, key) => {
+      if (key !== 'sort' && key !== 'page') {
+        newParams[key] = paramValue;
+      }
+    });
+    if (value !== "created_at") {
+      newParams.sort = value;
+    }
+    setSearchParams(newParams);
+  }, [searchParams, setSearchParams]);
 
   const resultsText = useMemo(() => {
     if (!resultsCount) return "";
@@ -78,8 +81,7 @@ export const ProductFilter = ({
     <div className="flex gap-2 items-center">
       <span className="text-sm text-[#3E424A]">{resultsText}</span>
       <div className="bg-[#E1DFE1] mx-3 min-h-[20px] w-[1px]" />
-
-      {/* Filter Dropdown */}
+ 
       <div className="relative">
         <button className="cursor-pointer flex gap-4 font-poppins text-base text-[#10151F]" onClick={handleFilterToggle}>
           <img src={filterIcon} alt="filter" />
@@ -97,9 +99,9 @@ export const ProductFilter = ({
                 title="price_from"
                 type="number"
                 className="rounded-lg border-1 border-[#E1DFE1] px-3 py-2.5"
-                value={priceFrom}
+                value={localPriceFrom}
                 placeholder="*from"
-                onChange={(e) => setPriceFrom(e.target.value)}
+                onChange={(e) => setLocalPriceFrom(e.target.value)}
               />
               <label htmlFor="price_to"></label>
               <input
@@ -108,8 +110,8 @@ export const ProductFilter = ({
                 id="price_to"
                 className="rounded-lg border-1 border-[#E1DFE1] px-3 py-2.5"
                 placeholder="*to"
-                value={priceTo}
-                onChange={(e) => setPriceTo(e.target.value)}
+                value={localPriceTo}
+                onChange={(e) => setLocalPriceTo(e.target.value)}
               />
             </div>
             <Button
@@ -122,8 +124,7 @@ export const ProductFilter = ({
           </div>
         )}
       </div>
-
-      {/* Sort Dropdown */}
+ 
       <div>
         <select
           title="sort"

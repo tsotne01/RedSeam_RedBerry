@@ -24,8 +24,14 @@ const router = createBrowserRouter([
       },
       {
         path: paths.products,
-        loader: async () => {
-          const { products, productsMetaData } = await getProducts();
+        loader: async ({ request }) => {
+          const url = new URL(request.url);
+          const page = Number(url.searchParams.get("page")) || undefined;
+          const sort = url.searchParams.get("sort") || undefined;
+          const price_from = url.searchParams.get("price_from") ? Number(url.searchParams.get("price_from")) : undefined;
+          const price_to = url.searchParams.get("price_to") ? Number(url.searchParams.get("price_to")) : undefined;
+          
+          const { products, productsMetaData } = await getProducts(page, sort, price_from, price_to);
           return { products, productsMetaData }
         },
         element: <ProductsPage />,

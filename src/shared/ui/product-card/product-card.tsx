@@ -11,6 +11,7 @@ export const ProductCard = (product: IProduct) => {
           src={product.cover_image}
           alt={product.name}
           className="max-w-[420px] h-[549px] object-cover rounded"
+          loading="lazy"
         />
       )}
       <div className="mt-3 flex flex-col gap-1">
