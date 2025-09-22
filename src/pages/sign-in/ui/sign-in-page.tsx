@@ -35,7 +35,7 @@ export const SignInPage = () => {
 
   return (
     <AuthLayout>
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6 mr-[45px]">
         <Input
           label="identifier"
           type="text"
